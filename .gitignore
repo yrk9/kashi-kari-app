@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Node / React
+node_modules/
+dist/
+.eslintcache
+
+# Docker / DB
+postgres_data/
+
+# OS
+.DS_Store
+.env
