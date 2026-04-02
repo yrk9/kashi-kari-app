@@ -13,5 +13,9 @@ export const apiClient = async (endpoint: string, options: RequestInit = {}) => 
         throw new Error(`API request failed: ${response.status}`);
     }
     
-    return response.json();
+    const contentType = response.headers.get("Content-Type")
+    if (contentType && contentType.includes("application/json")) {
+        return response.json();
+    }
+    return null;
 };
