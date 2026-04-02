@@ -79,7 +79,7 @@ const handleDelete = async (id: number) => {
 
   return (
     <div style={{padding: '40px', maxWidth: '600px', margin: '0 auto', fontFamily: 'sans-serif'}}>
-      <h1 style={{borderBottom: '2px solid #333', paddingBottom: '10px'}}>貸し借り記録</h1>
+      <h1 className="text-5xl font-black text-orange-500 bg-black p-4 text-center">Tailwind 起動成功！</h1>
 
       {/* 入力フォーム */}
       <form onSubmit={handleSubmit} style={{ marginBottom: '30px', padding: '20px', border: '1px solid #ddd', borderRadius: '8px'}}>
