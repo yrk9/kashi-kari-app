@@ -46,6 +46,24 @@ def create_record(record: schema.RecordCreate, db: Session = Depends(get_db)):
     return db_record
 
 
+@app.put("/records/{record_id}")
+def update_record(record_id: int, updated_record: schema.RecordUpdate, db: Session = Depends(get_db)):
+    db_record = db.query(model.LendingRecord).filter(model.LendingRecord.id == record_id).first()
+
+    if db_record is None:
+        return HTTPException(status_code=404, detail="Record not found")
+
+    db_record.name = updated_record.name
+    db_record.content = updated_record.content
+    db_record.amount = updated_record.amount
+    db_record.type = updated_record.type
+    db_record.is_complete = updated_record.is_complete
+
+    db.commit()
+    db.refresh(db_record)
+    return db_record
+
+
 @app.patch("/records/{record_id}/complete", response_model=schema.RecordResponse)
 def complete_record(record_id: int, db: Session = Depends(get_db)):
     db_record = db.query(model.LendingRecord).filter(model.LendingRecord.id == record_id).first()

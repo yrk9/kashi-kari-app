@@ -48,6 +48,35 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   }
 };
 
+//完了トグル処理
+const handleToggleComplete = async (record: Record) => {
+  try {
+    await apiClient(`/records/${record.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        ...record,
+        is_complete: !record.is_complete
+      }),
+    });
+    fetchRecords();
+  } catch (error) {
+    console.error('Failed to toggle complete:', error);
+  }
+};
+
+//データの削除
+const handleDelete = async (id: number) => {
+  if (!confirm("本当に削除しますか？")) return;
+  try {
+    await apiClient(`/records/${id}`, {
+      method: 'DELETE',
+    });
+    fetchRecords();
+  } catch (error) {
+    console.error('Failed to delete record:', error);
+  }
+}
+
   return (
     <div style={{padding: '40px', maxWidth: '600px', margin: '0 auto', fontFamily: 'sans-serif'}}>
       <h1 style={{borderBottom: '2px solid #333', paddingBottom: '10px'}}>貸し借り記録</h1>
@@ -75,17 +104,27 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         <ul style={{listStyle: 'none', padding: 0}}>
           {records.map((record) => (
             <li key={record.id} style={{
-              background: '#f9f9f9',
+              background: record.is_complete ?'#f9f9f9' : '#f9f9f9',
               margin: '10px 0',
               padding: '15px',
               borderRadius: '8px',
-              boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+              boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+              opacity: record.is_complete ? 0.7 : 1
             }}>
               <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{record.name}</span>
               <span style={{ color: '#555'}}> {record.content}</span>
               <div style={{ marginTop: '5px', fontWeight: 'bold', color: '#007bff' }}>
                 {record.type === 'MONEY' ? `¥${record.amount}` : '物品'}
-                {record.is_complete ? ' (完了)' : ' (未完了)'}
+                {/* 完了状態の表示 */}
+                <button onClick={() => handleToggleComplete(record)}>
+                  {record.is_complete ? ' (完了)' : ' (未完了)'}
+                </button>
+                {/* 削除ボタン */}
+                <button onClick={() => handleDelete(record.id)}
+                  style={{ marginLeft: '10px', color: 'red' }}
+                > 
+                  削除
+                </button>
               </div>
             </li>
           ))}

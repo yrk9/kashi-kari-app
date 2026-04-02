@@ -10,6 +10,14 @@ class RecordCreate(BaseModel):
     amount: Optional[int] = None
 
 
+class RecordUpdate(BaseModel):
+    name: str
+    type: str
+    content: str
+    amount: Optional[int] = None
+    is_complete: bool
+
+
 # データベースからフロントに返すデータのスキーマ
 class RecordResponse(BaseModel):
     id: int
