@@ -78,59 +78,82 @@ const handleDelete = async (id: number) => {
 }
 
   return (
-    <div style={{padding: '40px', maxWidth: '600px', margin: '0 auto', fontFamily: 'sans-serif'}}>
-      <h1 className="text-5xl font-black text-orange-500 bg-black p-4 text-center">Tailwind 起動成功！</h1>
+    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-md mx-auto">
+
+      {/* タイトル */}
+      <h1 className="text-3xl font-extrabold text-center text-gray-900 mb-8 flex items-center justify-center gap-2">
+        <span className="text-4xl">🤝</span>貸し借りマネージャー
+      </h1>
 
       {/* 入力フォーム */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: '30px', padding: '20px', border: '1px solid #ddd', borderRadius: '8px'}}>
-        <h3>新規登録</h3>
-        <div>
-          <input placeholder="名前" value={name} onChange={(e) => setName(e.target.value)} required></input>
-          <input placeholder="内容" value={content} onChange={(e) => setContent(e.target.value)} required></input>
-        </div>
-        <div style={{ marginTop: '10px'}}>
-          <input type="number" placeholder="金額" value={amount} onChange={(e) => setAmount(Number(e.target.value))}></input>
-          <select value={type} onChange={(e) => setType(e.target.value as any)}>
+      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6 mb-8 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-700 mb-4">新規登録</h3>
+        <div className="space-y-4">
+          <input className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outrline-none transition"
+          placeholder="名前" value={name} onChange={(e) => setName(e.target.value)} required></input>
+          <input className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outrline-none transition"
+          placeholder="内容" value={content} onChange={(e) => setContent(e.target.value)} required></input>
+        <div className="flex gap-2">
+          <input type="number" className="flex-1 px-4 py-2 border rounded-lg outline-none"
+                 placeholder="金額" value={amount} onChange={(e) => setAmount(Number(e.target.value))}></input>
+          <select 
+            className="px-4 py-2 border rounded-lg bg-white outline-none"
+            value={type} onChange={(e) => setType(e.target.value as any)}
+          >
             <option value="MONEY">お金</option>
             <option value="ITEM">モノ</option>
           </select>
-          <button type="submit" style={{ marginLeft: '10px'}}>登録</button>
         </div>
+        <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg shadow-lg
+                transition duration-200">
+          登録
+        </button>
+       </div>
       </form>
 
+      {/* データ表示部分 */}
+      <div className="space-y-4">
       {records.length === 0 ? (
-        <p>データがありません</p>
+        <p className="text-center text-gray-500">データがありません</p>
       ) : (
-        <ul style={{listStyle: 'none', padding: 0}}>
-          {records.map((record) => (
-            <li key={record.id} style={{
-              background: record.is_complete ?'#f9f9f9' : '#f9f9f9',
-              margin: '10px 0',
-              padding: '15px',
-              borderRadius: '8px',
-              boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-              opacity: record.is_complete ? 0.7 : 1
-            }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{record.name}</span>
-              <span style={{ color: '#555'}}> {record.content}</span>
-              <div style={{ marginTop: '5px', fontWeight: 'bold', color: '#007bff' }}>
-                {record.type === 'MONEY' ? `¥${record.amount}` : '物品'}
-                {/* 完了状態の表示 */}
-                <button onClick={() => handleToggleComplete(record)}>
-                  {record.is_complete ? ' (完了)' : ' (未完了)'}
-                </button>
-                {/* 削除ボタン */}
-                <button onClick={() => handleDelete(record.id)}
-                  style={{ marginLeft: '10px', color: 'red' }}
+          records.map((record) => (
+            <div key={record.id} className={`p-5 rounded-xl shadow-sm border transition ${record.is_complete ? 'bg-gray-100 border-gray-200 opacity-60' : 'bg-white border-blue-50'}`}>
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="font-bold text-lg text-gray-800">{record.name}</h4>
+                  <p className="text-gray-600 mt-1">{record.content}</p>
+                </div>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${record.type === 'MONEY' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700'}`}>
+                  {record.type === 'MONEY' ? 'MONEY' : 'ITEM'}
+                </span>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between">
+                <span className="text-xl font-black text-blue-600">
+                  {record.amount ? `${record.amount.toLocaleString()} 円` : '-'}
+                </span>
+                <div className="flex gap-2">
+                  <button onClick={() => handleToggleComplete(record)}
+                   className={`px-3 py-1 rounded-md text-sm font-bold transition ${record.is_complete ? 'bg-gray-400 text-white' : 'bg-green-500 hover:bg-green-600 text-white'}`}
+                  >
+                    {record.is_complete ? ' (完了)' : ' (未完了)'}
+                  </button>
+
+                  {/* 削除ボタン */}
+                  <button onClick={() => handleDelete(record.id)}
+                    className="px-3 py-1 bg-red-50 hover:bg-red-100 tex-red-500 rounded-md text-sm font-bold transition"
                 > 
                   削除
                 </button>
               </div>
-            </li>
-          ))}
-        </ul>
+            </div>
+          </div>
+          ))
       )}
+      </div>
     </div>
+  </div>
   );
 }
 
