@@ -1,13 +1,13 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from typing import Optional
 
 # フロントから受け取るデータのスキーマ
 class RecordCreate(BaseModel):
-    name: str
+    name: str = Field(..., min_length=1, max_length=50)
     type: str   # "モノか" or "カネか"
-    content: str
-    amount: Optional[int] = None
+    content: str = Field(..., min_length=1, max_length=100)
+    amount: Optional[int] = Field(None, ge=0)
 
 
 class RecordUpdate(BaseModel):
