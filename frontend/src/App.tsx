@@ -18,6 +18,9 @@ function App() {
   const [amount, setAmount] = useState<number>(0);
   const [type, setType] = useState<"MONEY" | "ITEM">("MONEY");
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState<"ALL" | "ACTIVE" | "COMPLETED">("ALL");
+
 
   const fetchRecords = async () => {
       try {
@@ -91,6 +94,15 @@ const handleDelete = async (id: number) => {
   }
 }
 
+const filteredRecords = records.filter((record) => {
+  const matchesSearch = record.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+  const matchesStatus = 
+    filterStatus === "ALL" ? true :
+    filterStatus === "ACTIVE" ? !record.is_complete : record.is_complete;
+    return matchesSearch && matchesStatus;
+});
+
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-md mx-auto">
@@ -132,12 +144,42 @@ const handleDelete = async (id: number) => {
        </div>
       </form>
 
+      {/* 検索・フィルタリング部分 */}
+      <div className="mb-6 space-y-4">
+        {/* 検索入力 */}
+        <div className="relative">
+          <input 
+            type="text"
+            placeholder="名前で検索..."
+            className="w-full pl-10 pr-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          ></input>
+          <span className="absolute left-3 top-2.5 opacity-40"></span>
+        </div>
+
+        {/* ステータス切り替え*/}
+        <div className="flex bg-gray-100 p-1 rounded-lg">
+          {(["ALL", "ACTIVE", "COMPLETED"] as const).map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status)}
+              className={`flex-1 py-1.5 text-sm font-bold rounded-md transition ${
+                filterStatus === status ? "bg-white shadow text-blue-600" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              {status === "ALL" ? "すべて" : status === "ACTIVE" ? "未完了" : "完了済み"}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* データ表示部分 */}
       <div className="space-y-4">
-      {records.length === 0 ? (
+      {filteredRecords.length === 0 ? (
         <p className="text-center text-gray-500">データがありません</p>
       ) : (
-          records.map((record) => (
+          filteredRecords.map((record) => (
             <div key={record.id} className={`p-5 rounded-xl shadow-sm border transition ${record.is_complete ? 'bg-gray-100 border-gray-200 opacity-60' : 'bg-white border-blue-50'}`}>
               <div className="flex justify-between items-start">
                 <div>
