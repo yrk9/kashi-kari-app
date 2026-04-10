@@ -103,6 +103,11 @@ const filteredRecords = records.filter((record) => {
     return matchesSearch && matchesStatus;
 });
 
+const activeRecords = records.filter(r => !r.is_complete);
+const totalPendingAmount = activeRecords.reduce((sum, r) => sum + (r.amount || 0), 0);
+const pendingCount = activeRecords.length;
+const completedCount = records.length - pendingCount;
+
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-md mx-auto">
@@ -111,6 +116,26 @@ const filteredRecords = records.filter((record) => {
       <h1 className="text-3xl font-extrabold text-center text-gray-900 mb-8 flex items-center justify-center gap-2">
         <span className="text-4xl">🤝</span>貸し借りマネージャー
       </h1>
+
+      {/* サマリー */}
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="bg-blue-600 rounded-2xl p-4 text-white shadow-lg shadow-blue-200">
+          <p className="text-blue-100 text-xs font-bold uppercase tracking-wider">未返却の合計</p>
+          <div className="flex items-baseline gap-1 mt-1">
+            <span className="text-2xl font-block">{totalPendingAmount.toLocaleString()}</span>
+            <span className="text-sm opacity-80">円</span>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+          <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">未完了の件数</p>
+          <div className="flex items-baseline gap-1 mt-1">
+            <span className="text-2xl font-black text-gray-800">{pendingCount}</span>
+            <span className="text-sm text-gray-500 font-bold">件</span>
+          </div>
+        </div>
+      </div>
+
 
       {/* 入力フォーム */}
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6 mb-8 border border-gray-100">
