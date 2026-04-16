@@ -8,7 +8,7 @@ interface Props {
 export const RecordForm = ({ fetchRecords }: Props) => {
     const [name, setName] = useState('');
     const [content, setContent] = useState('');
-    const [amount, setAmount] = useState<number>(0);
+    const [amount, setAmount] = useState<number | "">("");
     const [type, setType] = useState<"MONEY" | "ITEM">("MONEY");
     const [error, setError] = useState<string | null>(null);
 
@@ -21,7 +21,7 @@ export const RecordForm = ({ fetchRecords }: Props) => {
         return;
       }
     
-      if (amount < 0) {
+      if (Number(amount) < 0) {
         setError("金額は0円以上を入力してください。");
         return;
       }
@@ -29,11 +29,16 @@ export const RecordForm = ({ fetchRecords }: Props) => {
       try {
         await apiClient('/records', {
           method: 'POST',
-          body: JSON.stringify({ name, content, amount, type, is_complete: false }),
+          body: JSON.stringify({ 
+            name, 
+            content, 
+            amount: amount === "" ? 0 : Number(amount),
+            type, 
+            is_complete: false }),
         });
         setName('');
         setContent('');
-        setAmount(0);
+        setAmount('');
         fetchRecords();
       } catch (error) {
         console.error('Failed to submit record:', error);
@@ -53,8 +58,17 @@ export const RecordForm = ({ fetchRecords }: Props) => {
           <input className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
           placeholder="内容" value={content} onChange={(e) => setContent(e.target.value)} required></input>
         <div className="flex gap-2">
-          <input type="number" className="flex-1 px-4 py-2 border rounded-lg outline-none"
-                 placeholder="金額" value={amount} onChange={(e) => setAmount(Number(e.target.value))}></input>
+            <input 
+                type="number" 
+                className="flex-1 px-4 py-2 border rounded-lg outline-none"
+                placeholder="金額" 
+                value={amount} 
+                onChange={(e) => {
+                    const val = e.target.value;
+                    setAmount(val === "" ? "" : Number(val));
+                }}>
+
+            </input>
           <select 
             className="px-4 py-2 border rounded-lg bg-white outline-none"
             value={type} onChange={(e) => setType(e.target.value as any)}
