@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { apiClient } from '../api';
+import type { Record } from '../types';
 
 interface Props {
-    fetchRecords: () => Promise<void>;
+  onAdd: (record: Omit<Record, 'id' | 'owner_id'>) => Promise<void>;
 }
 
-export const RecordForm = ({ fetchRecords }: Props) => {
+export const RecordForm = ({ onAdd }: Props) => {
     const [name, setName] = useState('');
     const [content, setContent] = useState('');
     const [amount, setAmount] = useState<number | "">("");
@@ -27,19 +27,17 @@ export const RecordForm = ({ fetchRecords }: Props) => {
       }
     
       try {
-        await apiClient('/records', {
-          method: 'POST',
-          body: JSON.stringify({ 
-            name, 
-            content, 
-            amount: amount === "" ? 0 : Number(amount),
-            type, 
-            is_complete: false }),
+        await onAdd({
+          name,
+          content,
+          amount: amount === "" ? 0 : Number(amount),
+          type,
+          is_complete: false
         });
+    
         setName('');
         setContent('');
         setAmount('');
-        fetchRecords();
       } catch (error) {
         console.error('Failed to submit record:', error);
         setError('データの送信に失敗しました。入力内容を確認してください。');

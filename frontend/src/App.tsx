@@ -24,22 +24,100 @@ function App() {
   };
 
   useEffect(() => {
-    fetchRecords();
-}, []);
+    if (token) {
+      fetchRecords();
+    } else {
+      setRecords([]);
+    }
+}, [token]);
 
 const activeRecords = records.filter(r => !r.is_complete);
 const totalPendingAmount = activeRecords.reduce((sum, r) => sum + (r.amount || 0), 0);
 const pendingCount = activeRecords.length;
 
-const handleLogin = (newToken: string) => {
+const handleAddRecord = async (newRecordData: any) => {
+  console.log("handleAddRecordが呼ばれました", newRecordData);
+
+  if (token) {
+    try {
+      await apiClient('/records', {
+        method: 'POST',
+        body: JSON.stringify(newRecordData),
+      });
+      await fetchRecords();
+    } catch (error) {
+      console.error('Failed to post record:', error);
+      throw error;
+    }
+  } else {
+    const guestRecord: Record = {
+      ...newRecordData,
+      id: Date.now(),
+    };
+    setRecords(prev => [...prev, guestRecord]);
+  }
+} 
+
+const handleToggleComplete = async (record: Record) => {
+  if (token) {
+    try {
+      await apiClient(`/records/${record.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          ...record,
+          is_complete: !record.is_complete
+        }),
+      });
+      await fetchRecords();
+    } catch (e) {
+      console.error(e);
+    }
+  } else {
+    setRecords(prev => prev.map(r => r.id === record.id ? {...r, is_complete: !r.is_complete} :r));
+  }
+};
+
+const handleDeleteRecord = async (id: number) => {
+  if (!confirm("本当に削除しますか?")) return;
+
+  if (token) {
+    try {
+      await apiClient(`/records/${id}`, {method: 'DELETE'});
+      await fetchRecords();
+    } catch (e) {
+      console.error(e);
+    }
+  } else {
+    setRecords(prev => prev.filter(r => r.id !== id));
+  }
+};
+
+const handleLogin = async (newToken: string) => {
   setToken(newToken);
   localStorage.setItem('token', newToken);
+
+  try {
+    const response = await fetch('http://localhost:8000/records', {
+      headers: { 
+        'Authorization': `Bearer ${newToken}` // 保存したばかりのトークンを使用
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      // 3. 取得したリストをステートにセット（これで画面が切り替わる）
+      setRecords(data);
+    }
+  } catch (error) {
+    console.error("ログイン後のデータ取得に失敗しました:", error);
+  }
 };
 
 const handleLogout = () => {
   setToken(null);
   setIsGuest(false);
   localStorage.removeItem('token');
+  setRecords([]);
 };
 
 if (!token && !isGuest) {
@@ -91,7 +169,8 @@ if (!token && !isGuest) {
           <Summary totalAmount={totalPendingAmount} totalItems={pendingCount} />
 
           {/* 入力フォーム */}
-          <RecordForm fetchRecords={fetchRecords} />
+          <RecordForm 
+            onAdd={handleAddRecord} />
 
           {/* 検索・フィルタリング部分 */}
           <Filter 
@@ -107,7 +186,8 @@ if (!token && !isGuest) {
             records={records}
             filterStatus={filterStatus}
             searchQuery={searchQuery}
-            fetchRecords={fetchRecords}
+            onToggle={handleToggleComplete}
+            onDelete={handleDeleteRecord}
           />
           </div>
         </div>

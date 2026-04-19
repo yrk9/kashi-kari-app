@@ -30,18 +30,21 @@ def read_root():
 
 
 @app.get("/records")
-def get_records(db: Session = Depends(get_db)):
-    return db.query(model.LendingRecord).all()
+def get_records(
+    db: Session = Depends(get_db),
+    current_user: model.User = Depends(auth.get_current_user)
+): 
+    return db.query(model.LendingRecord).filter(model.LendingRecord.owner_id == current_user.id).all()
 
 
 @app.post("/records")
-def create_record(record: schema.RecordCreate, db: Session = Depends(get_db)):
-    db_record = model.LendingRecord(
-        name = record.name,
-        type = record.type,
-        content = record.content,
-        amount = record.amount
-    )
+def create_record(
+    record: schema.RecordCreate, 
+    db: Session = Depends(get_db),
+    current_user: model.User = Depends(auth.get_current_user)
+):
+
+    db_record = model.LendingRecord(**record.dict(), owner_id=current_user.id)
     db.add(db_record)
     db.commit()
     db.refresh(db_record)
@@ -79,8 +82,16 @@ def complete_record(record_id: int, db: Session = Depends(get_db)):
 
 
 @app.delete("/records/{record_id}")
-def delete_record(record_id: int, db: Session = Depends(get_db)):
-    db_record = db.query(model.LendingRecord).filter(model.LendingRecord.id == record_id).first()
+def delete_record(
+    record_id: int, 
+    db: Session = Depends(get_db),
+    current_user: model.User = Depends(auth.get_current_user)
+):
+    db_record = db.query(model.LendingRecord).filter(
+        model.LendingRecord.id == record_id,
+        model.LendingRecord.owner_id == current_user.id
+    ).first()
+
     if not db_record:
         return {"error": "Record not found"}
 
