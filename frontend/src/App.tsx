@@ -11,7 +11,6 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<"ALL" | "ACTIVE" | "COMPLETED">("ALL");
 
-
   const fetchRecords = async () => {
       try {
         const data = await apiClient('/records');
