@@ -15,6 +15,7 @@ export const AuthForm = ({onLogin}: Props) => {
         setError('');
 
         const endpoint = isLogin ? '/login' : '/signup';
+        const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
         try {
             const options: RequestInit = isLogin
@@ -28,7 +29,7 @@ export const AuthForm = ({onLogin}: Props) => {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({username, password})
                 };
-            const response = await fetch(`http://localhost:8000${endpoint}`, options);
+            const response = await fetch(`${BASE_URL}${endpoint}`, options);
             const data = await response.json();
 
             if (!response.ok) throw new Error(data.detail || '認証に失敗しました');
