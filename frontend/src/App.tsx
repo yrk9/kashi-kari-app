@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react';
 import { apiClient } from './api';
 import type{ Record } from './types';
-import { Filter } from './components/Filter';
-import { Summary } from './components/Summary';
-import { RecordForm } from './components/RecordForm';
-import { RecordItem } from './components/RecordItem';
 import { AuthForm } from './components/AuthForm';
+import { Dashboard } from './components/Dashboard';
+import {  Routes, Route } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 function App() {
+  const navigate = useNavigate();
   const [records, setRecords] = useState<Record[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"ALL" | "ACTIVE" | "COMPLETED">("ALL");
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [isGuest, setIsGuest] = useState(false);
 
@@ -29,170 +27,37 @@ function App() {
     } else {
       setRecords([]);
     }
-}, [token]);
+  }, [token]);
 
-const activeRecords = records.filter(r => !r.is_complete);
-const totalPendingAmount = activeRecords.reduce((sum, r) => sum + (r.amount || 0), 0);
-const pendingCount = activeRecords.length;
-
-const handleAddRecord = async (newRecordData: any) => {
-  console.log("handleAddRecordが呼ばれました", newRecordData);
-
-  if (token) {
-    try {
-      await apiClient('/records', {
-        method: 'POST',
-        body: JSON.stringify(newRecordData),
-      });
-      await fetchRecords();
-    } catch (error) {
-      console.error('Failed to post record:', error);
-      throw error;
-    }
-  } else {
-    const guestRecord: Record = {
-      ...newRecordData,
-      id: Date.now(),
-    };
-    setRecords(prev => [...prev, guestRecord]);
-  }
-} 
-
-const handleToggleComplete = async (record: Record) => {
-  if (token) {
-    try {
-      await apiClient(`/records/${record.id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          ...record,
-          is_complete: !record.is_complete
-        }),
-      });
-      await fetchRecords();
-    } catch (e) {
-      console.error(e);
-    }
-  } else {
-    setRecords(prev => prev.map(r => r.id === record.id ? {...r, is_complete: !r.is_complete} :r));
-  }
-};
-
-const handleDeleteRecord = async (id: number) => {
-  if (!confirm("本当に削除しますか?")) return;
-
-  if (token) {
-    try {
-      await apiClient(`/records/${id}`, {method: 'DELETE'});
-      await fetchRecords();
-    } catch (e) {
-      console.error(e);
-    }
-  } else {
-    setRecords(prev => prev.filter(r => r.id !== id));
-  }
-};
-
-const handleLogin = async (newToken: string) => {
-  setToken(newToken);
-  localStorage.setItem('token', newToken);
-
-  try {
-    const response = await fetch('http://localhost:8000/records', {
-      headers: { 
-        'Authorization': `Bearer ${newToken}` // 保存したばかりのトークンを使用
-      }
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      // 3. 取得したリストをステートにセット（これで画面が切り替わる）
-      setRecords(data);
-    }
-  } catch (error) {
-    console.error("ログイン後のデータ取得に失敗しました:", error);
-  }
-};
-
-const handleLogout = () => {
-  setToken(null);
-  setIsGuest(false);
-  localStorage.removeItem('token');
-  setRecords([]);
-};
-
-if (!token && !isGuest) {
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12">
-      <AuthForm onLogin={handleLogin}></AuthForm>
-        <div className="mt-8 text-center">
-          <button 
-            onClick={() => setIsGuest(true)}
-            className="text-gray-400 font-bold hover:text-gray-500 transition border-blue-500"
-          >
-            ログインせずに利用する(データは保存されません)
-          </button>
-        </div>
-    </div>
-  );
-}
+  const handleLogout = () => {
+    setToken(null);
+    setIsGuest(false);
+    localStorage.removeItem('token');
+    setRecords([]);
+    navigate('/login')
+  };
 
   return (
-    <div className="p-4">
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-xl font-black">
-          {token ? 'マイページ': 'ゲストモード'}
-        </h1>
-        <button
-          onClick={handleLogout}
-          className="px-4 py-2 bg-gray-200 rounded-lg font-bold hover:bg-gray-300"
-        >
-          {token ? 'ログアウト' : 'ログイン画面へ'}
-        </button>
-      </header>
-
-      <main>
-        {token ? (
-          <p className="text-green-600 font-bold mb-4">データはサーバに保存されます。</p>
-        ) : (
-          <p className="text-amber-600 font-bold mb-4">注意: ブラウザを閉じるとデータが削除されます</p>
-        )}
-
-        <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 font-sans">
-          <div className="max-w-md mx-auto">
-
-          {/* タイトル */}
-          <h1 className="text-3xl font-extrabold text-center text-gray-900 mb-8 flex items-center justify-center gap-2">
-            <span className="text-4xl">🤝</span>貸し借りマネージャー
-          </h1>
-
-          {/* サマリー */}
-          <Summary totalAmount={totalPendingAmount} totalItems={pendingCount} />
-
-          {/* 入力フォーム */}
-          <RecordForm 
-            onAdd={handleAddRecord} />
-
-          {/* 検索・フィルタリング部分 */}
-          <Filter 
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            filterStatus={filterStatus}
-            setFilterStatus={setFilterStatus}
-          />
-
-
-          {/* データ表示部分 */}
-          <RecordItem 
+      <Routes>
+        {/* ログイン */}
+        <Route
+          path="/login"
+          element={<AuthForm setRecords={setRecords}></AuthForm>}
+        ></Route>
+        {/* ダッシュボード */}
+        <Route
+          path="/dashboard"
+          element={<Dashboard 
+            token={token} 
             records={records}
-            filterStatus={filterStatus}
-            searchQuery={searchQuery}
-            onToggle={handleToggleComplete}
-            onDelete={handleDeleteRecord}
-          />
-          </div>
-        </div>
-      </main>
-    </div>
+            setRecords={setRecords}
+            handleLogout={handleLogout}
+            fetchRecords={fetchRecords}
+          ></Dashboard>}
+        ></Route>
+        {/* 初期ページをログインへ設定 */}
+          <Route path="/" element={<AuthForm setRecords={setRecords}></AuthForm>}></Route>
+      </Routes>
   );
 }
 

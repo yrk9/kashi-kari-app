@@ -10,8 +10,8 @@ interface Props {
 
 export const RecordItem = ({records, filterStatus, searchQuery, onToggle, onDelete}: Props) => {
     const filteredRecords = records.filter((record) => {
-    const matchesSearch = record.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = 
+      const matchesSearch = record.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = 
         filterStatus === "ALL" ? true :
         filterStatus === "ACTIVE" ? !record.is_complete : record.is_complete;
         return matchesSearch && matchesStatus;

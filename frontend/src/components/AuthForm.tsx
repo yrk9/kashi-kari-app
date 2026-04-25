@@ -1,21 +1,47 @@
 import React, {useState} from 'react';
+import { useNavigate } from "react-router-dom";
+import type{ Record } from '../types';
 
 interface Props {
-    onLogin: (token: string) => void;
+    setRecords: (records: Record[]) => void;
 }
 
-export const AuthForm = ({onLogin}: Props) => {
+export const AuthForm = ({ setRecords }: Props) => {
+    const navigate = useNavigate();
+    const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
     const [isLogin, setIsLogin] = useState(true);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isGuest, setIsGuest] = useState(false);
+    const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
+    const handleLogin = async (newToken: string) => {
+        setToken(newToken);
+        localStorage.setItem('token', newToken);
+
+        try {
+            const response = await fetch(BASE_URL, {
+            headers: { 
+                'Authorization': `Bearer ${newToken}` // 保存したばかりのトークンを使用
+            }
+            });
+            
+            if (response.ok) {
+            const data = await response.json();
+                // 3. 取得したリストをステートにセット（これで画面が切り替わる）
+                setRecords(data);
+                navigate('/dashboard');
+            }
+        } catch (error) {
+            console.error("ログイン後のデータ取得に失敗しました:", error);
+        }
+    };
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
         const endpoint = isLogin ? '/login' : '/signup';
-        const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
         try {
             const options: RequestInit = isLogin
@@ -35,7 +61,7 @@ export const AuthForm = ({onLogin}: Props) => {
             if (!response.ok) throw new Error(data.detail || '認証に失敗しました');
 
             if (isLogin) {
-                onLogin(data.access_token);
+                handleLogin(data.access_token);
             } else {
                 alert('登録完了! ログインしてください');
                 setIsLogin(true);
@@ -92,6 +118,16 @@ export const AuthForm = ({onLogin}: Props) => {
             >
                 {isLogin ? 'まだアカウントがない方はこちら': 'すでにアカウントをお持ちの方'}
             </button>
+
+
+            <div className="mt-8 text-center">
+                <button 
+                    onClick={() => setIsGuest(true)}
+                    className="text-gray-400 font-bold hover:text-gray-500 transition border-blue-500"
+                >
+                    ログインせずに利用する(データは保存されません)
+                </button>
+            </div>
         </div>
     );
 };
