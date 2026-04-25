@@ -21,7 +21,7 @@ export const AuthForm = ({ setRecords }: Props) => {
         localStorage.setItem('token', newToken);
 
         try {
-            const response = await fetch(BASE_URL, {
+            const response = await fetch(`${BASE_URL}/records`, {
             headers: { 
                 'Authorization': `Bearer ${newToken}` // 保存したばかりのトークンを使用
             }
@@ -30,7 +30,8 @@ export const AuthForm = ({ setRecords }: Props) => {
             if (response.ok) {
             const data = await response.json();
                 // 3. 取得したリストをステートにセット（これで画面が切り替わる）
-                setRecords(data);
+                const actualRecords = Array.isArray(data) ? data : [];
+                setRecords(actualRecords);
                 navigate('/dashboard');
             }
         } catch (error) {

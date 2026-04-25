@@ -17,6 +17,10 @@ export const Dashboard = ({token, records, setRecords, handleLogout, fetchRecord
     const [filterStatus, setFilterStatus] = useState<"ALL" | "ACTIVE" | "COMPLETED">("ALL");
     const [searchQuery, setSearchQuery] = useState("");
 
+    if (!Array.isArray(records)) {
+        return <div className="text-center py-10">読み込み中...</div>;
+    }
+
     const handleAddRecord = async (newRecordData: any) => {
       if (token) {
         try {
