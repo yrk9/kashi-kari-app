@@ -4,9 +4,10 @@ import type{ Record } from '../types';
 
 interface Props {
     setRecords: (records: Record[]) => void;
+    handleTransfar: (transfar: string) => void;
 }
 
-export const AuthForm = ({ setRecords }: Props) => {
+export const AuthForm = ({ setRecords, handleTransfar}: Props) => {
     const navigate = useNavigate();
     const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
     const [isLogin, setIsLogin] = useState(true);
@@ -72,6 +73,12 @@ export const AuthForm = ({ setRecords }: Props) => {
         }
     };
 
+    const handleGuest = () => {
+        setRecords([]);
+        localStorage.removeItem('token');
+        navigate('/dashboard');
+    }
+
     return (
         <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 max-w-sm mx-auto">
             <h2 className="text-2xl font-black mb-6 text-center">
@@ -123,10 +130,17 @@ export const AuthForm = ({ setRecords }: Props) => {
 
             <div className="mt-8 text-center">
                 <button 
-                    onClick={() => setIsGuest(true)}
+                    onClick={handleGuest}
                     className="text-gray-400 font-bold hover:text-gray-500 transition border-blue-500"
                 >
                     ログインせずに利用する(データは保存されません)
+                </button>
+
+                <button
+                    onClick={() => handleTransfar("top")}
+                    className="w-full py-3 bg-blue-600 text-white rounded-xl font-black hover:bg-700 transition shadow-lg shadow-blue-200"
+                >
+                    トップページに戻る
                 </button>
             </div>
         </div>

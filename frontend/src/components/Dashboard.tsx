@@ -11,9 +11,10 @@ interface Props {
     setRecords: React.Dispatch<React.SetStateAction<Record[]>>;
     handleLogout:() => void;
     fetchRecords:() => void;
+    handleTransfar:(transfar: string) => void;
 }
 
-export const Dashboard = ({token, records, setRecords, handleLogout, fetchRecords} :Props) => {
+export const Dashboard = ({token, records, setRecords, handleLogout, fetchRecords, handleTransfar} :Props) => {
     const [filterStatus, setFilterStatus] = useState<"ALL" | "ACTIVE" | "COMPLETED">("ALL");
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -87,12 +88,22 @@ export const Dashboard = ({token, records, setRecords, handleLogout, fetchRecord
                 <h1 className="text-xl font-black">
                     {token ? 'マイページ': 'ゲストモード'}
                 </h1>
-                <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-gray-200 rounded-lg font-bold hover:bg-gray-300"
-                >
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleTransfar("top")}
+                    className="px-4 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-lg transition"
+                  >
+                  トップ
+                  </button>
+                  
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 bg-gray-200 rounded-lg font-bold hover:bg-gray-300"
+                  >
                     {token ? 'ログアウト' : 'ログイン画面へ'}
                 </button>
+                </div>
+                
             </header>
             <main>
                 {token ? (
