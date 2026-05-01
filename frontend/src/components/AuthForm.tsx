@@ -15,8 +15,9 @@ export const AuthForm = ({ setRecords, handleTransfar }: Props) => {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [isGuest, setIsGuest] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); //デフォルトでパスワードは非表示
   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
   const handleLogin = async (newToken: string) => {
@@ -44,6 +45,17 @@ export const AuthForm = ({ setRecords, handleTransfar }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    const passwordRegax = /^[a-zA-Z0-9]+$/;
+    if (!passwordRegax.test(password)) {
+      setError("パスワードは半角英数字のみ使用できます");
+      return;
+    }
+
+    if (!isLogin && password !== confirmPassword) {
+      setError("パスワードが一致しません");
+      return;
+    }
 
     const endpoint = isLogin ? "/login" : "/signup";
 
@@ -103,18 +115,44 @@ export const AuthForm = ({ setRecords, handleTransfar }: Props) => {
         </div>
 
         {/* パスワード */}
-        <div>
+        <div className="relative">
           <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">
             パスワード
           </label>
           <input
-            type="text"
+            type={showPassword ? "text" : "password"}
             className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-blue-400"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            pattern="^[a-zA-Z0-9]+$"
+            title="パスワードは半角英数字のみ使用できます"
             required
           ></input>
+
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-7 text-sm text-gray-400 hover: text-gray-600 font-bold"
+          >
+            {showPassword ? "非表示" : "表示"}
+          </button>
         </div>
+
+        {/* 確認用パスワード（新規登録時のみ表示） */}
+        {!isLogin && (
+          <div className="transition-all duration-300">
+            <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">
+              パスワード（確認用）
+            </label>
+            <input
+              type={showPassword ? "text" : "password"}
+              className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-blue-400"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            ></input>
+          </div>
+        )}
 
         {error && <p className="text-red-500 text-xs font-bold">{error}</p>}
 

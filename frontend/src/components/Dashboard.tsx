@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Filter } from "./Filter";
 import { RecordForm } from "./RecordForm";
 import { RecordItem } from "./RecordItem";
+import { Summary } from "./Summary";
 import { apiClient } from "../api";
 import type { Record } from "../types";
 
@@ -90,9 +91,12 @@ export const Dashboard = ({
     }
   };
 
-  //const activeRecords = records.filter(r => !r.is_complete);
-  //const totalPendingAmount = activeRecords.reduce((sum, r) => sum + (r.amount || 0), 0);
-  //const pendingCount = activeRecords.length;
+  const activeRecords = records.filter((r) => !r.is_complete);
+  const totalPendingAmount = activeRecords.reduce(
+    (sum, r) => sum + (r.amount || 0),
+    0,
+  );
+  const pendingCount = activeRecords.length;
   console.log(
     "Current records type:",
     typeof records,
@@ -141,7 +145,10 @@ export const Dashboard = ({
             </h1>
 
             {/* サマリー */}
-            {/*<Summary totalAmount={totalPendingAmount} totalItems={pendingCount} />*/}
+            <Summary
+              totalAmount={totalPendingAmount}
+              totalItems={pendingCount}
+            />
 
             {/* 入力フォーム */}
             <RecordForm onAdd={handleAddRecord} />
