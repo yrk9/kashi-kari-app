@@ -34,7 +34,6 @@ function App() {
 
   const handleLogout = () => {
     setToken(null);
-    setIsGuest(false);
     localStorage.removeItem("token");
     setRecords([]);
     navigate("/login");
