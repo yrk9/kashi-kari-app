@@ -13,7 +13,6 @@ function App() {
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("token"),
   );
-  const [isGuest, setIsGuest] = useState(false);
 
   const fetchRecords = async () => {
     try {
