@@ -5,13 +5,11 @@ import type { Record } from "../types";
 interface Props {
   setRecords: (records: Record[]) => void;
   handleTransfar: (transfar: string) => void;
+  setToken: (token: string | null) => void;
 }
 
-export const AuthForm = ({ setRecords, handleTransfar }: Props) => {
+export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
   const navigate = useNavigate();
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token"),
-  );
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

@@ -66,6 +66,7 @@ function App() {
           <AuthForm
             setRecords={setRecords}
             handleTransfar={handleTransfar}
+            setToken={setToken}
           ></AuthForm>
         }
       ></Route>
