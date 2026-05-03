@@ -44,3 +44,36 @@ class User(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class GroupCreate(BaseModel):
+    description: str = Field(..., min_length=1, max_length=100)
+    total_amount: int = Field(..., gt=0)
+
+
+class PaymentCreate(BaseModel):
+    user_name: str
+    amount: int = Field(..., gt=0)
+
+
+class GroupResponse(BaseModel):
+    id: str
+    description: str
+    total_amount: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class PaymentResponse(BaseModel):
+    id: int
+    user_name: str
+    amount: int
+
+    class Config:
+        from_attributes = True
+
+
+class GroupDetailResponse(GroupResponse):
+    payments: List[PaymentResponse] = []

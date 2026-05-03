@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import model
 import schema
@@ -134,3 +134,38 @@ def login_for_access_token(
 
     access_token = auth.create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+#グループ作成
+@app.post("/groups", response_model=schema.GroupResponse)
+def create_group(
+    group: schema.GroupCreate, 
+    db: Session = Depends(get_db),
+    # current_user: model.User = Depends(auth.get_current_user)
+):
+    # db_group = model.Group(**group.dict(), owner_id=current_user.id)
+    db_group = model.Group(**group.dict(), owner_id=1)
+    db.add(db_group)
+    db.commit()
+    db.refresh(db_group)
+    return db_group
+
+
+#グループの詳細取得
+@app.get("/groups/{group_id}", response_model=schema.GroupDetailResponse)
+def get_group(group_id: str, db: Session = Depends(get_db)):
+    db_group = db.query(model.Group).filter(model.Group.id == group_id).first()
+    if not db_group:
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    return db_group
+
+
+#支払いの登録
+@app.post("/groups/{group_id}/payments")
+def create_payments(group_id: str, payment: schema.PaymentCreate, db: Session = Depends(get_db)):
+    db_payment = model.GroupPayment(**payment.dict(), group_id=group_id)
+    db.add(db_payment)
+    db.commit()
+    db.refresh(db_payment)
+    return db_payment
