@@ -1,97 +1,191 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import type { Record } from "../types";
 
 interface Props {
-    onLogin: (token: string) => void;
+  setRecords: (records: Record[]) => void;
+  handleTransfar: (transfar: string) => void;
+  setToken: (token: string | null) => void;
 }
 
-export const AuthForm = ({onLogin}: Props) => {
-    const [isLogin, setIsLogin] = useState(true);
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
+  const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(true);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); //デフォルトでパスワードは非表示
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
+  const handleLogin = async (newToken: string) => {
+    setToken(newToken);
+    localStorage.setItem("token", newToken);
 
-        const endpoint = isLogin ? '/login' : '/signup';
-        const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+    try {
+      const response = await fetch(`${BASE_URL}/records`, {
+        headers: {
+          Authorization: `Bearer ${newToken}`, // 保存したばかりのトークンを使用
+        },
+      });
 
-        try {
-            const options: RequestInit = isLogin
-                ? {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: new URLSearchParams({username, password})
-                }
-                : {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({username, password})
-                };
-            const response = await fetch(`${BASE_URL}${endpoint}`, options);
-            const data = await response.json();
+      if (response.ok) {
+        const data = await response.json();
+        // 3. 取得したリストをステートにセット（これで画面が切り替わる）
+        const actualRecords = Array.isArray(data) ? data : [];
+        setRecords(actualRecords);
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.error("ログイン後のデータ取得に失敗しました:", error);
+    }
+  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
 
-            if (!response.ok) throw new Error(data.detail || '認証に失敗しました');
+    const passwordRegax = /^[a-zA-Z0-9]+$/;
+    if (!passwordRegax.test(password)) {
+      setError("パスワードは半角英数字のみ使用できます");
+      return;
+    }
 
-            if (isLogin) {
-                onLogin(data.access_token);
-            } else {
-                alert('登録完了! ログインしてください');
-                setIsLogin(true);
-            }
-        } catch (err: any) {
-            setError(err.message);
-        }
-    };
+    if (!isLogin && password !== confirmPassword) {
+      setError("パスワードが一致しません");
+      return;
+    }
 
-    return (
-        <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 max-w-sm mx-auto">
-            <h2 className="text-2xl font-black mb-6 text-center">
-                {isLogin ? 'おかえりなさい': 'アカウント作成'}
-            </h2>
+    const endpoint = isLogin ? "/login" : "/signup";
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                {/* ユーザー名 */}
-                <div>
-                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">ユーザ名</label>
-                    <input
-                        type="text"
-                        className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-blue-400"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required>
-                    </input>
-                </div>
+    try {
+      const options: RequestInit = isLogin
+        ? {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ username, password }),
+          }
+        : {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          };
+      const response = await fetch(`${BASE_URL}${endpoint}`, options);
+      const data = await response.json();
 
-                {/* パスワード */}
-                <div>
-                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">パスワード</label>
-                    <input
-                        type="text"
-                        className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-blue-400"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required>
-                    </input>
-                </div>
+      if (!response.ok) throw new Error(data.detail || "認証に失敗しました");
 
-                {error && <p className="text-red-500 text-xs font-bold">{error}</p>}
+      if (isLogin) {
+        handleLogin(data.access_token);
+      } else {
+        alert("登録完了! ログインしてください");
+        setIsLogin(true);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
 
-                <button
-                    type="submit"
-                    className="w-full py-3 bg-blue-600 text-white rounded-xl font-black hover:bg-700 transition shadow-lg shadow-blue-200"
-                >
-                    {isLogin ? 'ログイン': '新規登録'}
-                </button>
-            </form>
+  const handleGuest = () => {
+    setRecords([]);
+    localStorage.removeItem("token");
+    navigate("/dashboard");
+  };
 
-            <button 
-                onClick={() => setIsLogin(!isLogin)}
-                className="w-full mt-4 text-sm text-gray-500 font-bold hover:underline"
-            >
-                {isLogin ? 'まだアカウントがない方はこちら': 'すでにアカウントをお持ちの方'}
-            </button>
+  return (
+    <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 max-w-sm mx-auto">
+      <h2 className="text-2xl font-black mb-6 text-center">
+        {isLogin ? "おかえりなさい" : "アカウント作成"}
+      </h2>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* ユーザー名 */}
+        <div>
+          <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">
+            ユーザ名
+          </label>
+          <input
+            type="text"
+            className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-blue-400"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          ></input>
         </div>
-    );
+
+        {/* パスワード */}
+        <div className="relative">
+          <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">
+            パスワード
+          </label>
+          <input
+            type={showPassword ? "text" : "password"}
+            className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-blue-400"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            pattern="^[a-zA-Z0-9]+$"
+            title="パスワードは半角英数字のみ使用できます"
+            required
+          ></input>
+
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-7 text-sm text-gray-400 hover: text-gray-600 font-bold"
+          >
+            {showPassword ? "非表示" : "表示"}
+          </button>
+        </div>
+
+        {/* 確認用パスワード（新規登録時のみ表示） */}
+        {!isLogin && (
+          <div className="transition-all duration-300">
+            <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">
+              パスワード（確認用）
+            </label>
+            <input
+              type={showPassword ? "text" : "password"}
+              className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-blue-400"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            ></input>
+          </div>
+        )}
+
+        {error && <p className="text-red-500 text-xs font-bold">{error}</p>}
+
+        <button
+          type="submit"
+          className="w-full py-3 bg-blue-600 text-white rounded-xl font-black hover:bg-700 transition shadow-lg shadow-blue-200"
+        >
+          {isLogin ? "ログイン" : "新規登録"}
+        </button>
+      </form>
+
+      <button
+        onClick={() => setIsLogin(!isLogin)}
+        className="w-full mt-4 text-sm text-gray-500 font-bold hover:underline"
+      >
+        {isLogin
+          ? "まだアカウントがない方はこちら"
+          : "すでにアカウントをお持ちの方"}
+      </button>
+
+      <div className="mt-8 text-center">
+        <button
+          onClick={handleGuest}
+          className="text-gray-400 font-bold hover:text-gray-500 transition border-blue-500"
+        >
+          ログインせずに利用する(データは保存されません)
+        </button>
+
+        <button
+          onClick={() => handleTransfar("top")}
+          className="w-full py-3 bg-blue-600 text-white rounded-xl font-black hover:bg-700 transition shadow-lg shadow-blue-200"
+        >
+          トップページに戻る
+        </button>
+      </div>
+    </div>
+  );
 };
