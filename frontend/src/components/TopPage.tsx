@@ -30,7 +30,7 @@ export const TopPage = ({ handleTransfar }: Props) => {
             </button>
 
             <button
-              onClick={() => handleTransfar("kari")}
+              onClick={() => handleTransfar("group")}
               className="w-full py-3 bg-blue-600 text-white rounded-xl font-black hover:bg-700 transition shadow-lg shadow-blue-200"
             >
               グループで貸し借り

@@ -6,6 +6,7 @@ import { Dashboard } from "./components/Dashboard";
 import { Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { TopPage } from "./components/TopPage";
+import { GroupForm } from "./components/GroupForm";
 
 function App() {
   const navigate = useNavigate();
@@ -45,6 +46,8 @@ function App() {
       navigate("/dashboard");
     } else if (buttonType == "kari") {
       navigate("/kari");
+    } else if (buttonType == "group") {
+      navigate("/group");
     } else {
       navigate("/");
     }
@@ -82,6 +85,9 @@ function App() {
           ></Dashboard>
         }
       ></Route>
+
+      <Route path="/group" element={<GroupForm></GroupForm>}></Route>
+
       {/* 初期ページをログインへ設定 */}
       <Route
         path="/"
