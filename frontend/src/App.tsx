@@ -5,7 +5,6 @@ import { AuthForm } from "./components/AuthForm";
 import { Dashboard } from "./components/Dashboard";
 import { Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { TopPage } from "./components/TopPage";
 
 function App() {
   const navigate = useNavigate();
@@ -45,6 +44,8 @@ function App() {
       navigate("/dashboard");
     } else if (buttonType == "kari") {
       navigate("/kari");
+    } else if (buttonType == "group") {
+      navigate("/group");
     } else {
       navigate("/");
     }
@@ -52,11 +53,6 @@ function App() {
 
   return (
     <Routes>
-      <Route
-        path="/"
-        element={<TopPage handleTransfar={handleTransfar}></TopPage>}
-      ></Route>
-
       {/* ログイン */}
       <Route
         path="/login"
@@ -70,7 +66,7 @@ function App() {
       ></Route>
       {/* ダッシュボード */}
       <Route
-        path="/dashboard"
+        path="/"
         element={
           <Dashboard
             token={token}
@@ -78,14 +74,8 @@ function App() {
             setRecords={setRecords}
             handleLogout={handleLogout}
             fetchRecords={fetchRecords}
-            handleTransfar={handleTransfar}
           ></Dashboard>
         }
-      ></Route>
-      {/* 初期ページをログインへ設定 */}
-      <Route
-        path="/"
-        element={<TopPage handleTransfar={handleTransfar}></TopPage>}
       ></Route>
     </Routes>
   );

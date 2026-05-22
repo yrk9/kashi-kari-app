@@ -12,7 +12,6 @@ interface Props {
   setRecords: React.Dispatch<React.SetStateAction<Record[]>>;
   handleLogout: () => void;
   fetchRecords: () => void;
-  handleTransfar: (transfar: string) => void;
 }
 
 export const Dashboard = ({
@@ -21,7 +20,6 @@ export const Dashboard = ({
   setRecords,
   handleLogout,
   fetchRecords,
-  handleTransfar,
 }: Props) => {
   const [filterStatus, setFilterStatus] = useState<
     "ALL" | "ACTIVE" | "COMPLETED"
@@ -63,7 +61,7 @@ export const Dashboard = ({
             is_complete: !record.is_complete,
           }),
         });
-        await fetchRecords();
+        fetchRecords();
       } catch (e) {
         console.error(e);
       }
@@ -82,7 +80,7 @@ export const Dashboard = ({
     if (token) {
       try {
         await apiClient(`/records/${id}`, { method: "DELETE" });
-        await fetchRecords();
+        fetchRecords();
       } catch (e) {
         console.error(e);
       }
@@ -97,32 +95,19 @@ export const Dashboard = ({
     0,
   );
   const pendingCount = activeRecords.length;
-  console.log(
-    "Current records type:",
-    typeof records,
-    Array.isArray(records),
-    records,
-  );
 
   return (
     <div>
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-xl font-black">
+      <header className="flex justify-between items-center mb-8 px-2 py-4">
+        <h1 className="text-xl font-black ml-4">
           {token ? "マイページ" : "ゲストモード"}
         </h1>
         <div className="flex gap-2">
           <button
-            onClick={() => handleTransfar("top")}
-            className="px-4 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-lg transition"
-          >
-            トップ
-          </button>
-
-          <button
             onClick={handleLogout}
             className="px-4 py-2 bg-gray-200 rounded-lg font-bold hover:bg-gray-300"
           >
-            {token ? "ログアウト" : "ログイン画面へ"}
+            {token ? "ログアウト" : "ログイン"}
           </button>
         </div>
       </header>
@@ -132,7 +117,7 @@ export const Dashboard = ({
             データはサーバに保存されます。
           </p>
         ) : (
-          <p className="text-amber-600 font-bold mb-4">
+          <p className="text-amber-600 font-bold mb-4 ml-4">
             注意: ブラウザを閉じるとデータが削除されます
           </p>
         )}
@@ -141,7 +126,7 @@ export const Dashboard = ({
           <div className="max-w-md mx-auto">
             {/* タイトル */}
             <h1 className="text-3xl font-extrabold text-center text-gray-900 mb-8 flex items-center justify-center gap-2">
-              <span className="text-4xl">🤝</span>貸し借りマネージャー
+              貸し借りマネージャー
             </h1>
 
             {/* サマリー */}
