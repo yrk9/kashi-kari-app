@@ -67,7 +67,7 @@ export const RecordItem = ({
                 {/* 削除ボタン */}
                 <button
                   onClick={() => onDelete(record.id)}
-                  className="px-3 py-1 bg-red-50 hover:bg-red-100 tex-red-500 rounded-md text-sm font-bold transition"
+                  className="px-3 py-1 bg-red-50 hover:bg-red-100 text-red-500 rounded-md text-sm font-bold transition"
                 >
                   削除
                 </button>

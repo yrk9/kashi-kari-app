@@ -11,7 +11,7 @@ export const Summary = ({ totalAmount, totalItems }: Props) => {
           未返却の合計
         </p>
         <div className="flex items-baseline gap-1 mt-1">
-          <span className="text-2xl font-block">
+          <span className="text-2xl font-black">
             {totalAmount.toLocaleString()}
           </span>
           <span className="text-sm opacity-80">円</span>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Record } from "../types";
+import { apiClient } from "../api";
 
 interface Props {
   setRecords: (records: Record[]) => void;
@@ -16,30 +17,21 @@ export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false); //デフォルトでパスワードは非表示
-  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
   const handleLogin = async (newToken: string) => {
     setToken(newToken);
     localStorage.setItem("token", newToken);
 
-    try {
-      const response = await fetch(`${BASE_URL}/records`, {
-        headers: {
-          Authorization: `Bearer ${newToken}`, // 保存したばかりのトークンを使用
-        },
-      });
+    const options = {
+      headers: { Authorization: `Bearer ${newToken}` },
+    };
+    const data = await apiClient("/records", options);
 
-      if (response.ok) {
-        const data = await response.json();
-        // 3. 取得したリストをステートにセット（これで画面が切り替わる）
-        const actualRecords = Array.isArray(data) ? data : [];
-        setRecords(actualRecords);
-        navigate("/dashboard");
-      }
-    } catch (error) {
-      console.error("ログイン後のデータ取得に失敗しました:", error);
-    }
+    const actualRecords = Array.isArray(data) ? data : [];
+    setRecords(actualRecords);
+    navigate("/dashboard");
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -69,10 +61,7 @@ export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password }),
           };
-      const response = await fetch(`${BASE_URL}${endpoint}`, options);
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.detail || "認証に失敗しました");
+      const data = await apiClient(`${endpoint}`, options);
 
       if (isLogin) {
         handleLogin(data.access_token);
@@ -85,14 +74,8 @@ export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
     }
   };
 
-  const handleGuest = () => {
-    setRecords([]);
-    localStorage.removeItem("token");
-    navigate("/dashboard");
-  };
-
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 max-w-sm mx-auto">
+    <div className="bg-white p-8 mt-16 rounded-2xl shadow-xl border border-gray-100 w-full max-w-sm mx-auto">
       <h2 className="text-2xl font-black mb-6 text-center">
         {isLogin ? "おかえりなさい" : "アカウント作成"}
       </h2>
@@ -154,9 +137,15 @@ export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
 
         {error && <p className="text-red-500 text-xs font-bold">{error}</p>}
 
+        {!isLogin && (
+          <p className="w-full mt-2 text-xs text-red-600">
+            パスワードは半角英数字を組み合わせてください
+          </p>
+        )}
+
         <button
           type="submit"
-          className="w-full py-3 bg-blue-600 text-white rounded-xl font-black hover:bg-700 transition shadow-lg shadow-blue-200"
+          className="w-full py-3 mt-4 bg-blue-600 text-white rounded-xl font-black hover:bg-700 transition shadow-lg shadow-blue-200"
         >
           {isLogin ? "ログイン" : "新規登録"}
         </button>
@@ -172,13 +161,6 @@ export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
       </button>
 
       <div className="mt-8 text-center">
-        <button
-          onClick={handleGuest}
-          className="text-gray-400 font-bold hover:text-gray-500 transition border-blue-500"
-        >
-          ログインせずに利用する(データは保存されません)
-        </button>
-
         <button
           onClick={() => handleTransfar("top")}
           className="w-full py-3 bg-blue-600 text-white rounded-xl font-black hover:bg-700 transition shadow-lg shadow-blue-200"
