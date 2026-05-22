@@ -5,8 +5,6 @@ import { AuthForm } from "./components/AuthForm";
 import { Dashboard } from "./components/Dashboard";
 import { Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { TopPage } from "./components/TopPage";
-import { GroupForm } from "./components/GroupForm";
 
 function App() {
   const navigate = useNavigate();
@@ -55,11 +53,6 @@ function App() {
 
   return (
     <Routes>
-      <Route
-        path="/"
-        element={<TopPage handleTransfar={handleTransfar}></TopPage>}
-      ></Route>
-
       {/* ログイン */}
       <Route
         path="/login"
@@ -73,7 +66,7 @@ function App() {
       ></Route>
       {/* ダッシュボード */}
       <Route
-        path="/dashboard"
+        path="/"
         element={
           <Dashboard
             token={token}
@@ -84,14 +77,6 @@ function App() {
             handleTransfar={handleTransfar}
           ></Dashboard>
         }
-      ></Route>
-
-      <Route path="/group" element={<GroupForm></GroupForm>}></Route>
-
-      {/* 初期ページをログインへ設定 */}
-      <Route
-        path="/"
-        element={<TopPage handleTransfar={handleTransfar}></TopPage>}
       ></Route>
     </Routes>
   );
