@@ -136,22 +136,22 @@ def login_for_access_token(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-#グループ作成
+#グループ作成(未実装)
 @app.post("/groups", response_model=schema.GroupResponse)
 def create_group(
     group: schema.GroupCreate, 
     db: Session = Depends(get_db),
     # current_user: model.User = Depends(auth.get_current_user)
 ):
-    # db_group = model.Group(**group.dict(), owner_id=current_user.id)
-    db_group = model.Group(**group.dict(), owner_id=1)
+    db_group = model.Group(**group.dict(), owner_id=current_user.id)
+    # db_group = model.Group(**group.dict(), owner_id=1)
     db.add(db_group)
     db.commit()
     db.refresh(db_group)
     return db_group
 
 
-#グループの詳細取得
+#グループの詳細取得(未実装)
 @app.get("/groups/{group_id}", response_model=schema.GroupDetailResponse)
 def get_group(group_id: str, db: Session = Depends(get_db)):
     db_group = db.query(model.Group).filter(model.Group.id == group_id).first()
@@ -161,7 +161,7 @@ def get_group(group_id: str, db: Session = Depends(get_db)):
     return db_group
 
 
-#支払いの登録
+#支払いの登録(未実装)
 @app.post("/groups/{group_id}/payments")
 def create_payments(group_id: str, payment: schema.PaymentCreate, db: Session = Depends(get_db)):
     db_payment = model.GroupPayment(**payment.dict(), group_id=group_id)
