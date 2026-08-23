@@ -53,11 +53,19 @@ def create_record(
 
 
 @app.put("/records/{record_id}")
-def update_record(record_id: int, updated_record: schema.RecordUpdate, db: Session = Depends(get_db)):
-    db_record = db.query(model.LendingRecord).filter(model.LendingRecord.id == record_id).first()
+def update_record(
+    record_id: int,
+    updated_record: schema.RecordUpdate,
+    db: Session = Depends(get_db),
+    current_user: model.User = Depends(auth.get_current_user)
+):
+    db_record = db.query(model.LendingRecord).filter(
+        model.LendingRecord.id == record_id,
+        model.LendingRecord.owner_id == current_user.id
+    ).first()
 
     if db_record is None:
-        return HTTPException(status_code=404, detail="Record not found")
+        raise HTTPException(status_code=404, detail="Record not found")
 
     db_record.name = updated_record.name
     db_record.content = updated_record.content

@@ -4,7 +4,7 @@ from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 import database
 import model
 from sqlalchemy.orm import Session
@@ -38,19 +38,25 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 
 def get_current_user(db: Session = Depends(database.get_db), token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="認証情報が無効です",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
     try:
         # 1. トークンを解読（デコード）
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
-            raise "ユーザ名がない"
+            raise credentials_exception
     except JWTError:
-        raise "JWTのエラー"
+        raise credentials_exception
 
     # 2. DBからユーザーを取得
     user = db.query(model.User).filter(model.User.username == username).first()
     if user is None:
-        raise "ユーザが存在しない"
-    
+        raise credentials_exception
+
     # 3. ユーザーオブジェクトを返す
     return user
