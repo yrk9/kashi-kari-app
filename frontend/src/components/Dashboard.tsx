@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Header } from "./Header";
 import { Filter } from "./Filter";
 import { RecordForm } from "./RecordForm";
 import { RecordItem } from "./RecordItem";
@@ -98,36 +99,24 @@ export const Dashboard = ({
 
   return (
     <div>
-      <header className="flex justify-between items-center mb-8 px-2 py-4">
-        <h1 className="text-xl font-black ml-4">
-          {token ? "マイページ" : "ゲストモード"}
-        </h1>
-        <div className="flex gap-2">
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-gray-200 rounded-lg font-bold hover:bg-gray-300"
-          >
-            {token ? "ログアウト" : "ログイン"}
-          </button>
-        </div>
-      </header>
+      <Header token={token} handleLogout={handleLogout} />
       <main>
-        {token ? (
-          <p className="text-green-600 font-bold mb-4">
-            データはサーバに保存されます。
-          </p>
-        ) : (
-          <p className="text-amber-600 font-bold mb-4 ml-4">
-            注意: ブラウザを閉じるとデータが削除されます
-          </p>
-        )}
-
         <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 font-sans">
           <div className="max-w-md mx-auto">
-            {/* タイトル */}
-            <h1 className="text-3xl font-extrabold text-center text-gray-900 mb-8 flex items-center justify-center gap-2">
-              貸し借りマネージャー
-            </h1>
+            <div className="mb-8">
+              <h2 className="text-xl font-black text-gray-900">
+                {token ? "マイページ" : "ゲストモード"}
+              </h2>
+              {token ? (
+                <p className="text-green-600 font-bold text-sm mt-1">
+                  データはサーバに保存されます。
+                </p>
+              ) : (
+                <p className="text-amber-600 font-bold text-sm mt-1">
+                  注意: ブラウザを閉じるとデータが削除されます
+                </p>
+              )}
+            </div>
 
             {/* サマリー */}
             <Summary

@@ -30,7 +30,7 @@ export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
 
     const actualRecords = Array.isArray(data) ? data : [];
     setRecords(actualRecords);
-    navigate("/dashboard");
+    navigate("/");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
