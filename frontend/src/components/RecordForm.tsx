@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Record } from "../types";
+import { Button } from "./Button";
 
 interface Props {
   onAdd: (record: Omit<Record, "id" | "owner_id">) => Promise<void>;
@@ -90,14 +91,9 @@ export const RecordForm = ({ onAdd }: Props) => {
             <option value="ITEM">モノ</option>
           </select>
         </div>
-        <button
-          disabled={!name.trim() || !content.trim()}
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg shadow-lg
-                transition duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed"
-        >
+        <Button disabled={!name.trim() || !content.trim()} type="submit">
           登録
-        </button>
+        </Button>
       </div>
     </form>
   );

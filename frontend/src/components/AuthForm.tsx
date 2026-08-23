@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Record } from "../types";
 import { apiClient } from "../api";
+import { Button } from "./Button";
 
 interface Props {
   setRecords: (records: Record[]) => void;
@@ -75,7 +76,7 @@ export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
   };
 
   return (
-    <div className="bg-white p-8 mt-16 rounded-2xl shadow-xl border border-gray-100 w-full max-w-sm mx-auto">
+    <div className="bg-white p-8 mt-16 rounded-2xl border border-gray-100 w-full max-w-sm mx-auto">
       <h2 className="text-2xl font-black mb-6 text-center">
         {isLogin ? "おかえりなさい" : "アカウント作成"}
       </h2>
@@ -143,12 +144,9 @@ export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
           </p>
         )}
 
-        <button
-          type="submit"
-          className="w-full py-3 mt-4 bg-blue-600 text-white rounded-xl font-black hover:bg-700 transition shadow-lg shadow-blue-200"
-        >
+        <Button type="submit" className="mt-4">
           {isLogin ? "ログイン" : "新規登録"}
-        </button>
+        </Button>
       </form>
 
       <button
@@ -161,12 +159,9 @@ export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
       </button>
 
       <div className="mt-8 text-center">
-        <button
-          onClick={() => handleTransfar("top")}
-          className="w-full py-3 bg-blue-600 text-white rounded-xl font-black hover:bg-700 transition shadow-lg shadow-blue-200"
-        >
+        <Button onClick={() => handleTransfar("top")}>
           トップページに戻る
-        </button>
+        </Button>
       </div>
     </div>
   );
