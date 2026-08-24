@@ -7,6 +7,7 @@ interface Props {
 }
 
 export const RecordForm = ({ onAdd }: Props) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
   const [amount, setAmount] = useState<number | "">("");
@@ -39,11 +40,26 @@ export const RecordForm = ({ onAdd }: Props) => {
       setName("");
       setContent("");
       setAmount("");
+      setIsOpen(false);
     } catch (error) {
       console.error("Failed to submit record:", error);
       setError("データの送信に失敗しました。入力内容を確認してください。");
     }
   };
+
+  // 折りたたみ時は追加ボタンのみ表示
+  if (!isOpen) {
+    return (
+      <button
+        onClick={() => setIsOpen(true)}
+        className="w-full mb-8 py-3 bg-white border border-gray-200 rounded-xl shadow-sm font-bold text-blue-600
+              hover:bg-blue-50 hover:border-blue-300 transition"
+      >
+        ＋ 記録を追加
+      </button>
+    );
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -55,7 +71,19 @@ export const RecordForm = ({ onAdd }: Props) => {
           {error}
         </div>
       )}
-      <h3 className="text-lg font-bold text-gray-700 mb-4">新規登録</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold text-gray-700">記録を追加</h3>
+        <button
+          type="button"
+          onClick={() => {
+            setError(null);
+            setIsOpen(false);
+          }}
+          className="text-sm text-gray-400 font-bold hover:text-gray-600"
+        >
+          閉じる
+        </button>
+      </div>
       <div className="space-y-4">
         <input
           className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
