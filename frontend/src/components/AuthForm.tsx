@@ -5,14 +5,19 @@ import { apiClient } from "../api";
 import { Button } from "./Button";
 
 interface Props {
+  isLogin: boolean;
   setRecords: (records: Record[]) => void;
   handleTransfar: (transfar: string) => void;
   setToken: (token: string | null) => void;
 }
 
-export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
+export const AuthForm = ({
+  isLogin,
+  setRecords,
+  handleTransfar,
+  setToken,
+}: Props) => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -68,7 +73,7 @@ export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
         handleLogin(data.access_token);
       } else {
         alert("登録完了! ログインしてください");
-        setIsLogin(true);
+        navigate("/login");
       }
     } catch (err: any) {
       setError(err.message);
@@ -150,7 +155,7 @@ export const AuthForm = ({ setRecords, handleTransfar, setToken }: Props) => {
       </form>
 
       <button
-        onClick={() => setIsLogin(!isLogin)}
+        onClick={() => (isLogin ? navigate("/register") : navigate("/login"))}
         className="w-full mt-4 text-sm text-gray-500 font-bold hover:underline"
       >
         {isLogin
