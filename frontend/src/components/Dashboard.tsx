@@ -100,14 +100,14 @@ export const Dashboard = ({
   const pendingCount = activeRecords.length;
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50 font-sans">
       <Header
         token={token}
         handleLogout={handleLogout}
         handleTransfar={handleTransfar}
       />
       <main>
-        <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 font-sans">
+        <div className="py-10 px-4 sm:px-6 lg:px-8">
           <div className="max-w-md mx-auto">
             <div className="mb-8">
               <h2 className="text-xl font-black text-gray-900">
