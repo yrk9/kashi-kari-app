@@ -44,8 +44,8 @@ function App() {
       navigate("/dashboard");
     } else if (buttonType == "kari") {
       navigate("/kari");
-    } else if (buttonType == "group") {
-      navigate("/group");
+    } else if (buttonType == "register") {
+      navigate("/register");
     } else {
       navigate("/");
     }
@@ -58,12 +58,26 @@ function App() {
         path="/login"
         element={
           <AuthForm
+            isLogin={true}
             setRecords={setRecords}
             handleTransfar={handleTransfar}
             setToken={setToken}
           ></AuthForm>
         }
       ></Route>
+      {/* 登録 */}
+      <Route
+        path="/register"
+        element={
+          <AuthForm
+            isLogin={false}
+            setRecords={setRecords}
+            handleTransfar={handleTransfar}
+            setToken={setToken}
+          ></AuthForm>
+        }
+      ></Route>
+
       {/* ダッシュボード */}
       <Route
         path="/"
@@ -74,6 +88,7 @@ function App() {
             setRecords={setRecords}
             handleLogout={handleLogout}
             fetchRecords={fetchRecords}
+            handleTransfar={handleTransfar}
           ></Dashboard>
         }
       ></Route>
