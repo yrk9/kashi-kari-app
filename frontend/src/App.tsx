@@ -88,6 +88,7 @@ function App() {
             setRecords={setRecords}
             handleLogout={handleLogout}
             fetchRecords={fetchRecords}
+            handleTransfar={handleTransfar}
           ></Dashboard>
         }
       ></Route>

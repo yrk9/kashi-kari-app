@@ -13,6 +13,7 @@ interface Props {
   setRecords: React.Dispatch<React.SetStateAction<Record[]>>;
   handleLogout: () => void;
   fetchRecords: () => void;
+  handleTransfar: (transfar: string) => void;
 }
 
 export const Dashboard = ({
@@ -21,6 +22,7 @@ export const Dashboard = ({
   setRecords,
   handleLogout,
   fetchRecords,
+  handleTransfar,
 }: Props) => {
   const [filterStatus, setFilterStatus] = useState<
     "ALL" | "ACTIVE" | "COMPLETED"
@@ -99,7 +101,11 @@ export const Dashboard = ({
 
   return (
     <div>
-      <Header token={token} handleLogout={handleLogout} />
+      <Header
+        token={token}
+        handleLogout={handleLogout}
+        handleTransfar={handleTransfar}
+      />
       <main>
         <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 font-sans">
           <div className="max-w-md mx-auto">
