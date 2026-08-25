@@ -8,7 +8,7 @@ export const Summary = ({ totalAmount, totalItems }: Props) => {
     <div className="grid grid-cols-2 gap-4 mb-8">
       <div className="bg-blue-600 rounded-2xl p-4 text-white shadow-lg shadow-blue-200">
         <p className="text-blue-100 text-xs font-bold uppercase tracking-wider">
-          未返却の合計
+          未完了の合計
         </p>
         <div className="flex items-baseline gap-1 mt-1">
           <span className="text-2xl font-black">

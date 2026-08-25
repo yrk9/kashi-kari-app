@@ -31,7 +31,18 @@ export const RecordItem = ({
   return (
     <div className="space-y-4">
       {filteredRecords.length === 0 ? (
-        <p className="text-center text-gray-500">データがありません</p>
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm px-6 py-12 text-center">
+          <p className="font-bold text-gray-700">
+            {records.length === 0
+              ? "まだ記録がありません"
+              : "該当する記録がありません"}
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            {records.length === 0
+              ? "上の「＋ 記録を追加」から最初の記録を登録しましょう"
+              : "検索条件や絞り込みを変えてみてください"}
+          </p>
+        </div>
       ) : (
         filteredRecords.map((record) => (
           <div
