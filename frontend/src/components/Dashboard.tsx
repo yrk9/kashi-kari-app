@@ -100,30 +100,16 @@ export const Dashboard = ({
   const pendingCount = activeRecords.length;
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50 font-sans">
       <Header
         token={token}
         handleLogout={handleLogout}
         handleTransfar={handleTransfar}
       />
       <main>
-        <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 font-sans">
+        <div className="px-4 py-10 sm:px-6 lg:px-8">
+          {/* 本文は各要素の密度に合わせた幅で中央に配置する */}
           <div className="max-w-md mx-auto">
-            <div className="mb-8">
-              <h2 className="text-xl font-black text-gray-900">
-                {token ? "マイページ" : "ゲストモード"}
-              </h2>
-              {token ? (
-                <p className="text-green-600 font-bold text-sm mt-1">
-                  データはサーバに保存されます。
-                </p>
-              ) : (
-                <p className="text-amber-600 font-bold text-sm mt-1">
-                  注意: ブラウザを閉じるとデータが削除されます
-                </p>
-              )}
-            </div>
-
             {/* サマリー */}
             <Summary
               totalAmount={totalPendingAmount}
