@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Record } from "../types";
 import { apiClient } from "../api";
@@ -23,6 +23,11 @@ export const AuthForm = ({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false); //デフォルトでパスワードは非表示
+
+  // ログイン⇔登録を行き来したときに前の画面のエラーを残さない
+  useEffect(() => {
+    setError("");
+  }, [isLogin]);
 
   const handleLogin = async (newToken: string) => {
     setToken(newToken);
@@ -76,7 +81,7 @@ export const AuthForm = ({
         navigate("/login");
       }
     } catch (err: any) {
-      setError(err.message);
+      setError("ユーザ名またはパスワードが正しくありません");
     }
   };
 
